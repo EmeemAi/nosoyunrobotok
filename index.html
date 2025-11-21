@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>no soy un robot</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Space+Mono:wght@400&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    
+    <!-- React y ReactDOM (Versiones UMD Públicas y Estables) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel para traducir el código en el navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['Space Mono', 'monospace'],
+              calligraphy: ['"Ma Shan Zheng"', 'cursive'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 1.5s ease-out forwards',
+              'fade-in-delayed': 'fadeIn 1.5s ease-out 0.5s forwards',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #e5e5e5;
+        margin: 0;
+        overflow-x: hidden;
+      }
+      .bg-noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 50;
+        opacity: 0.03;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- Componente ProjectLink ---
+      const ProjectLink = ({ href, label, iconName, delayClass = '' }) => {
+        // Efecto para renderizar iconos cuando el componente se monta
+        useEffect(() => {
+          if (window.lucide) {
+            window.lucide.createIcons();
+          }
+        }, []);
+
+        return (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`
+              group relative w-full max-w-sm flex items-center justify-between
+              px-6 py-4 overflow-hidden rounded-xl border border-white/10 bg-white/5
+              backdrop-blur-sm transition-all duration-500 ease-out
+              hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-2xl hover:shadow-white/5
+              ${delayClass} opacity-0 animate-fade-in
+            `}
+          >
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 transition-colors group-hover:bg-white/10">
+                <i data-lucide={iconName} className="w-5 h-5 text-neutral-300 transition-colors group-hover:text-white"></i>
+              </div>
+              <span className="text-sm font-medium tracking-widest text-neutral-300 uppercase transition-colors group-hover:text-white font-sans">
+                {label}
+              </span>
+            </div>
+            
+            <i data-lucide="arrow-up-right" className="w-4 h-4 text-neutral-500 transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-white"></i>
+          </a>
+        );
+      };
+
+      // --- Componente Principal App ---
+      const App = () => {
+        const [mounted, setMounted] = useState(false);
+
+        useEffect(() => {
+          setMounted(true);
+          // Asegurarse de que los iconos se creen después del montaje inicial
+          setTimeout(() => {
+             if (window.lucide) window.lucide.createIcons();
+          }, 100);
+        }, []);
+
+        return (
+          <div className="relative min-h-screen flex flex-col items-center justify-center p-6 selection:bg-white selection:text-black">
+            {/* Background Ambience */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-900/10 rounded-full blur-[128px] animate-pulse-slow" />
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/10 rounded-full blur-[128px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+            </div>
+
+            <div className="bg-noise" />
+
+            <main className="z-10 w-full max-w-md flex flex-col items-center space-y-12">
+              
+              {/* Header Section */}
+              <header className={`flex flex-col items-center text-center space-y-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="relative group cursor-default">
+                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur opacity-0 group-hover:opacity-50 transition duration-1000"></div>
+                  {/* Logo Container */}
+                  <div className="relative w-32 h-32 rounded-full border border-white/10 flex items-center justify-center bg-white overflow-hidden shadow-2xl shadow-white/5 transition-transform duration-700 hover:scale-105">
+                    <span className="font-calligraphy text-7xl text-[#003366] select-none pt-2 pr-1">
+                      仁
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h1 className="text-4xl md:text-5xl font-light tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
+                    no soy un robot
+                  </h1>
+                  <p className="text-xs font-mono text-neutral-500 tracking-[0.2em] uppercase">
+                    proyecto musical
+                  </p>
+                </div>
+              </header>
+
+              {/* Links Section */}
+              <nav className="w-full flex flex-col space-y-4">
+                <ProjectLink 
+                  href="https://open.spotify.com" 
+                  label="Spotify" 
+                  iconName="music-2" 
+                  delayClass="animate-fade-in-delayed"
+                />
+                <ProjectLink 
+                  href="https://youtube.com" 
+                  label="YouTube" 
+                  iconName="youtube" 
+                  delayClass="animate-fade-in-delayed"
+                />
+              </nav>
+
+              {/* Footer */}
+              <footer className={`mt-16 text-center transition-opacity duration-1000 delay-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+                <p className="text-[10px] font-mono text-neutral-600 tracking-widest hover:text-neutral-400 transition-colors cursor-default">
+                  EST. 2024 — HUMANO VERIFICADO
+                </p>
+              </footer>
+
+            </main>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
