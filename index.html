@@ -75,7 +75,23 @@
         color: white;
       }
 
-      .glitch::before,
+      /* Base layer hidden by default, visible via pseudo-elements */
+      
+      .glitch::before {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        /* Permanent animation, faster speed (0.6s) */
+        animation: glitch-anim-1 0.6s infinite linear alternate-reverse;
+        color: #0ff;
+        clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        transform: translate(-2px, -2px);
+      }
+
       .glitch::after {
         content: attr(data-text);
         position: absolute;
@@ -83,20 +99,9 @@
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 0;
-      }
-
-      .group:hover .glitch::before {
         opacity: 0.5;
-        animation: glitch-anim-1 0.4s infinite linear alternate-reverse;
-        color: #0ff;
-        clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-        transform: translate(-2px, -2px);
-      }
-
-      .group:hover .glitch::after {
-        opacity: 0.5;
-        animation: glitch-anim-2 0.4s infinite linear alternate-reverse;
+        /* Permanent animation, faster speed (0.6s) */
+        animation: glitch-anim-2 0.6s infinite linear alternate-reverse;
         color: #f0f;
         clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
         transform: translate(2px, 2px);
@@ -244,4 +249,3 @@
     </script>
   </body>
 </html>
-
