@@ -9,16 +9,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Fuentes -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Space+Mono:wght@400&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Mono:wght@400&family=Ma+Shan+Zheng&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
     
-    <!-- React y ReactDOM (Versiones UMD Públicas y Estables) -->
+    <!-- React y ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel para traducir el código en el navegador -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons (Solo para la flecha) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -26,9 +26,14 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
+              sans: ['Inter', 'sans-serif'], // Spotify-like
               mono: ['Space Mono', 'monospace'],
               calligraphy: ['"Ma Shan Zheng"', 'cursive'],
+              youtube: ['"Roboto Condensed"', 'sans-serif'], // YouTube-like
+            },
+            colors: {
+              spotify: '#1DB954',
+              youtube: '#FF0000',
             },
             animation: {
               'fade-in': 'fadeIn 1.5s ease-out forwards',
@@ -85,7 +90,7 @@
         width: 100%;
         height: 100%;
         opacity: 0.5;
-        /* Permanent animation, faster speed (0.6s) */
+        /* Permanent animation, fast speed (0.6s) */
         animation: glitch-anim-1 0.6s infinite linear alternate-reverse;
         color: #0ff;
         clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
@@ -100,7 +105,7 @@
         width: 100%;
         height: 100%;
         opacity: 0.5;
-        /* Permanent animation, faster speed (0.6s) */
+        /* Permanent animation, fast speed (0.6s) */
         animation: glitch-anim-2 0.6s infinite linear alternate-reverse;
         color: #f0f;
         clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
@@ -132,14 +137,47 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
 
+      // --- SVGs Oficiales ---
+      const SpotifyLogo = () => (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+        </svg>
+      );
+
+      const YouTubeLogo = () => (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      );
+
       // --- Componente ProjectLink ---
-      const ProjectLink = ({ href, label, iconName, delayClass = '' }) => {
-        // Efecto para renderizar iconos cuando el componente se monta
+      const ProjectLink = ({ href, label, brand, delayClass = '' }) => {
+        
         useEffect(() => {
           if (window.lucide) {
             window.lucide.createIcons();
           }
         }, []);
+
+        // Configuración por marca
+        const brandConfig = {
+          spotify: {
+            icon: <SpotifyLogo />,
+            colorClass: "group-hover:text-[#1DB954]",
+            borderClass: "hover:border-[#1DB954]/50",
+            bgClass: "hover:shadow-[#1DB954]/10",
+            fontClass: "font-sans font-bold tracking-tight", // Inter Bold
+          },
+          youtube: {
+            icon: <YouTubeLogo />,
+            colorClass: "group-hover:text-[#FF0000]",
+            borderClass: "hover:border-[#FF0000]/50",
+            bgClass: "hover:shadow-[#FF0000]/10",
+            fontClass: "font-youtube font-bold tracking-tight uppercase text-lg", // Roboto Condensed
+          }
+        };
+
+        const config = brandConfig[brand];
 
         return (
           <a
@@ -148,22 +186,23 @@
             rel="noopener noreferrer"
             className={`
               group relative w-full max-w-sm flex items-center justify-between
-              px-6 py-4 overflow-hidden rounded-xl border border-white/10 bg-white/5
+              px-6 py-5 overflow-hidden rounded-xl border border-white/10 bg-white/5
               backdrop-blur-sm transition-all duration-500 ease-out
-              hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] hover:shadow-2xl hover:shadow-white/5
+              hover:bg-white/10 hover:scale-[1.02] hover:shadow-2xl
+              ${config.borderClass} ${config.bgClass}
               ${delayClass} opacity-0 animate-fade-in
             `}
           >
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/5 transition-colors group-hover:bg-white/10">
-                <i data-lucide={iconName} className="w-5 h-5 text-neutral-300 transition-colors group-hover:text-white"></i>
+            <div className="flex items-center space-x-5">
+              <div className={`flex items-center justify-center w-8 h-8 transition-colors text-neutral-400 ${config.colorClass}`}>
+                {config.icon}
               </div>
-              <span className="text-sm font-medium tracking-widest text-neutral-300 uppercase transition-colors group-hover:text-white font-sans">
+              <span className={`${config.fontClass} text-neutral-300 transition-colors ${config.colorClass}`}>
                 {label}
               </span>
             </div>
             
-            <i data-lucide="arrow-up-right" className="w-4 h-4 text-neutral-500 transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-white"></i>
+            <i data-lucide="arrow-up-right" className={`w-5 h-5 text-neutral-600 transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1 ${config.colorClass}`}></i>
           </a>
         );
       };
@@ -174,7 +213,6 @@
 
         useEffect(() => {
           setMounted(true);
-          // Asegurarse de que los iconos se creen después del montaje inicial
           setTimeout(() => {
              if (window.lucide) window.lucide.createIcons();
           }, 100);
@@ -221,13 +259,13 @@
                 <ProjectLink 
                   href="https://open.spotify.com/intl-es/artist/6VkkkImQrWV3Tj1aoVmULx" 
                   label="Spotify" 
-                  iconName="music-2" 
+                  brand="spotify"
                   delayClass="animate-fade-in-delayed"
                 />
                 <ProjectLink 
                   href="https://www.youtube.com/@NosoyunRobotNo" 
                   label="YouTube" 
-                  iconName="youtube" 
+                  brand="youtube"
                   delayClass="animate-fade-in-delayed"
                 />
               </nav>
@@ -235,7 +273,7 @@
               {/* Footer */}
               <footer className={`mt-16 text-center transition-opacity duration-1000 delay-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
                 <p className="text-[10px] font-mono text-neutral-600 tracking-widest hover:text-neutral-400 transition-colors cursor-default">
-                  EST. 2025 — HUMANO VERIFICADO
+                  EST. 2024 — HUMANO VERIFICADO
                 </p>
               </footer>
 
