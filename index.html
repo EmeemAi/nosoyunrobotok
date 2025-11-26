@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -45,17 +45,16 @@
             animation: {
               'fade-in': 'fadeIn 1.5s ease-out forwards',
               'fade-in-delayed': 'fadeIn 1.5s ease-out 0.5s forwards',
-              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'blink': 'blink 1s step-end infinite',
+              'sheen': 'sheen 1s ease-in-out infinite',
             },
             keyframes: {
               fadeIn: {
                 '0%': { opacity: '0', transform: 'translateY(10px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
-              blink: {
-                '0%, 100%': { opacity: '1' },
-                '50%': { opacity: '0' },
+              sheen: {
+                '0%': { transform: 'translateX(-100%) skewX(-15deg)' },
+                '100%': { transform: 'translateX(200%) skewX(-15deg)' },
               }
             }
           }
@@ -69,6 +68,7 @@
         margin: 0;
         overflow-x: hidden;
       }
+      
       .bg-noise {
         position: fixed;
         top: 0;
@@ -147,13 +147,13 @@
 
       // --- SVGs Oficiales ---
       const SpotifyLogo = () => (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3">
           <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
         </svg>
       );
 
       const YouTubeLogo = () => (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
           <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
         </svg>
       );
@@ -163,10 +163,7 @@
         const [email, setEmail] = useState('');
         const [status, setStatus] = useState('idle'); // idle, submitting, success
 
-        // CONFIGURACIÓN DE GOOGLE SHEET:
-        // 1. Crea un Google Form o un Google Apps Script Web App.
-        // 2. Pega la URL del script aquí abajo.
-        // Si lo dejas vacío, el formulario solo simulará el éxito visualmente.
+        // CONFIGURACIÓN DE GOOGLE SHEET (Opcional):
         const GOOGLE_SCRIPT_URL = ""; 
 
         const handleSubmit = async (e) => {
@@ -175,7 +172,6 @@
           
           if (GOOGLE_SCRIPT_URL) {
             try {
-              // Envío a Google Sheets (requiere script configurado)
               await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -183,12 +179,10 @@
               });
               setStatus('success');
             } catch (error) {
-              console.error("Error submitting", error);
-              // Fallback para mostrar éxito aunque falle CORS (común en Google Scripts)
               setStatus('success');
             }
           } else {
-            // SIMULACIÓN (Demo visual)
+            // SIMULACIÓN
             setTimeout(() => {
               setStatus('success');
             }, 1000);
@@ -250,33 +244,14 @@
       // --- Componente ProjectLink ---
       const ProjectLink = ({ href, label, brand, delayClass = '' }) => {
         
-        useEffect(() => {
-          if (window.lucide) {
-            window.lucide.createIcons();
-          }
-        }, []);
-
-        // Configuración por marca (COLORES PERMANENTES)
-        const brandConfig = {
-          spotify: {
-            icon: <SpotifyLogo />,
-            textColor: "text-[#1DB954]", // Siempre verde
-            borderColor: "border-[#1DB954]/30", // Borde sutil verde siempre
-            hoverBorder: "hover:border-[#1DB954]",
-            bgHover: "hover:shadow-[0_0_25px_rgba(29,185,84,0.4)]", // Green ambient glow
-            fontClass: "font-sans font-bold tracking-tight", 
-          },
-          youtube: {
-            icon: <YouTubeLogo />,
-            textColor: "text-[#FF0000]", // Siempre rojo
-            borderColor: "border-[#FF0000]/30", // Borde sutil rojo siempre
-            hoverBorder: "hover:border-[#FF0000]",
-            bgHover: "hover:shadow-[0_0_25px_rgba(255,0,0,0.4)]", // Red ambient glow
-            fontClass: "font-youtube font-bold tracking-tight uppercase text-lg", 
-          }
-        };
-
-        const config = brandConfig[brand];
+        // Estilos base por marca (Colores siempre visibles)
+        const brandStyles = brand === 'spotify' 
+          ? 'border-spotify text-spotify shadow-[0_0_10px_rgba(29,185,84,0.1)]' 
+          : 'border-youtube text-youtube shadow-[0_0_10px_rgba(255,0,0,0.1)]';
+          
+        const hoverGlow = brand === 'spotify'
+          ? 'group-hover:shadow-[0_0_30px_rgba(29,185,84,0.3)]'
+          : 'group-hover:shadow-[0_0_30px_rgba(255,0,0,0.3)]';
 
         return (
           <a
@@ -284,131 +259,98 @@
             target="_blank"
             rel="noopener noreferrer"
             className={`
-              group relative w-full max-w-sm flex items-center justify-between
-              px-6 py-5 overflow-hidden rounded-xl bg-white/5
-              backdrop-blur-sm transition-all duration-500 ease-out
-              border ${config.borderColor} ${config.hoverBorder}
-              hover:bg-white/10 hover:scale-[1.02] 
-              ${config.bgHover}
+              relative group flex items-center justify-between w-full max-w-sm p-4 
+              bg-black border rounded-xl transition-all duration-300 transform hover:scale-[1.02]
+              overflow-hidden ${brandStyles} ${hoverGlow}
               ${delayClass} opacity-0 animate-fade-in
             `}
           >
-            {/* Efecto de Brillo (Sheen) al pasar el mouse - Swipe Gradient */}
-            <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none" />
+             {/* Efecto Sheen (Brillo que pasa) */}
+            <div className="absolute top-0 left-0 w-1/2 h-full bg-white/10 skew-x-[-15deg] transform -translate-x-[150%] transition-transform duration-700 group-hover:animate-sheen pointer-events-none blur-sm"></div>
 
-            <div className="relative z-10 flex items-center space-x-5">
-              <div className={`flex items-center justify-center w-8 h-8 transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-3 ${config.textColor}`}>
-                {config.icon}
-              </div>
-              <span className={`${config.fontClass} transition-opacity duration-300 ${config.textColor}`}>
-                {label}
-              </span>
-            </div>
-            
-            <i data-lucide="arrow-up-right" className={`relative z-10 w-5 h-5 transition-all duration-300 transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:opacity-100 opacity-70 ${config.textColor}`}></i>
+            <span className="text-lg font-medium tracking-wide z-10 flex items-center gap-3">
+              {brand === 'spotify' ? <SpotifyLogo /> : <YouTubeLogo />}
+              <span className={brand === 'youtube' ? 'font-youtube tracking-tighter' : ''}>{label}</span>
+            </span>
+            <i data-lucide="arrow-right" className="w-5 h-5 opacity-70 transition-transform duration-300 group-hover:translate-x-1 z-10"></i>
           </a>
         );
       };
 
-      // --- Componente Principal App ---
+      // --- Main App Component ---
       const App = () => {
-        const [mounted, setMounted] = useState(false);
-        const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+        const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-        useEffect(() => {
-          setMounted(true);
-          setTimeout(() => {
-             if (window.lucide) window.lucide.createIcons();
-          }, 100);
-
-          // Control del movimiento del fondo
-          const handleMouseMove = (e) => {
-            // Calcula una posición normalizada (de -20px a 20px)
-            const x = (e.clientX / window.innerWidth) * 40 - 20;
-            const y = (e.clientY / window.innerHeight) * 40 - 20;
-            setMousePosition({ x, y });
-          };
-
-          window.addEventListener('mousemove', handleMouseMove);
-          return () => window.removeEventListener('mousemove', handleMouseMove);
-        }, []);
+        const handleMouseMove = (e) => {
+          // Normalizar posición del mouse (-1 a 1) para movimiento relativo
+          const x = (e.clientX / window.innerWidth) * 2 - 1;
+          const y = (e.clientY / window.innerHeight) * 2 - 1;
+          setMousePos({ x, y });
+        };
 
         return (
-          <div className="relative min-h-screen flex flex-col items-center justify-center p-6 selection:bg-white selection:text-black">
-            {/* Background Ambience Interactivo */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-              {/* Círculo Azul - Se mueve opuesto al mouse */}
-              <div 
-                className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-900/10 rounded-full blur-[128px] animate-pulse-slow transition-transform duration-1000 ease-out"
-                style={{ 
-                  transform: `translate(${mousePosition.x * -1}px, ${mousePosition.y * -1}px)` 
-                }}
+          <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden" onMouseMove={handleMouseMove}>
+            
+            {/* Background Noise Overlay */}
+            <div className="bg-noise"></div>
+            
+            {/* Interactive Ambient Background */}
+            <div 
+              className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-900/20 rounded-full blur-[120px] pointer-events-none transition-transform duration-100 ease-out"
+              style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
+            ></div>
+            <div 
+              className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-violet-900/10 rounded-full blur-[120px] pointer-events-none transition-transform duration-100 ease-out"
+              style={{ transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px)` }}
+            ></div>
+
+            {/* Logo Container */}
+            <div className="mb-10 z-10 animate-fade-in relative group">
+              <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-transform duration-700 hover:scale-105">
+                <span className="font-calligraphy text-7xl md:text-8xl text-slate-900 transform -rotate-6 select-none group-hover:rotate-0 transition-transform duration-500">
+                   仁
+                </span>
+              </div>
+            </div>
+
+            {/* Title & Subtitle */}
+            <div className="text-center z-10 mb-12 animate-fade-in">
+              <div className="glitch-wrapper mb-2">
+                 <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-white glitch" data-text="no soy un robot">
+                  no soy un robot
+                </h1>
+              </div>
+              <p className="text-neutral-400 font-mono text-sm tracking-widest uppercase mt-4 opacity-0 animate-fade-in-delayed">
+                canciones de un ser humano
+              </p>
+            </div>
+
+            {/* Links Section */}
+            <div className="flex flex-col gap-4 w-full items-center z-10">
+              <ProjectLink 
+                href="https://open.spotify.com/intl-es/artist/6VkkkImQrWV3Tj1aoVmULx"
+                label="Escuchar en Spotify"
+                brand="spotify"
+                delayClass="delay-[200ms]"
               />
-              {/* Círculo Violeta - Se mueve con el mouse pero con delay (simulado con opuesto inverso y css) */}
-              <div 
-                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/10 rounded-full blur-[128px] animate-pulse-slow transition-transform duration-1000 ease-out" 
-                style={{ 
-                  animationDelay: '2s',
-                  transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`
-                }} 
+              
+              <ProjectLink 
+                href="https://www.youtube.com/@NosoyunRobotNo"
+                label="Ver en YouTube"
+                brand="youtube"
+                delayClass="delay-[400ms]"
               />
             </div>
 
-            <div className="bg-noise" />
+            {/* Newsletter Section */}
+            <div className="z-10 w-full flex justify-center">
+              <Newsletter delayClass="delay-[600ms]" />
+            </div>
 
-            <main className="z-10 w-full max-w-md flex flex-col items-center space-y-10">
-              
-              {/* Header Section */}
-              <header className={`flex flex-col items-center text-center space-y-6 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="relative group cursor-default">
-                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur opacity-0 group-hover:opacity-50 transition duration-1000"></div>
-                  {/* Logo Container */}
-                  <div className="relative w-32 h-32 rounded-full border border-white/10 flex items-center justify-center bg-white overflow-hidden shadow-2xl shadow-white/5 transition-transform duration-700 hover:scale-105">
-                    <span className="font-calligraphy text-7xl text-[#003366] select-none pt-2 pr-1">
-                      仁
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 group cursor-default">
-                  <h1 className="text-4xl md:text-5xl font-light tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
-                    <span className="glitch-wrapper">
-                      <span className="glitch" data-text="no soy un robot">no soy un robot</span>
-                    </span>
-                  </h1>
-                  <p className="text-xs font-mono text-neutral-500 tracking-[0.2em] uppercase group-hover:text-neutral-400 transition-colors">
-                    canciones de un ser humano
-                  </p>
-                </div>
-              </header>
-
-              {/* Links Section */}
-              <nav className="w-full flex flex-col space-y-4">
-                <ProjectLink 
-                  href="https://open.spotify.com/intl-es/artist/6VkkkImQrWV3Tj1aoVmULx" 
-                  label="Spotify" 
-                  brand="spotify"
-                  delayClass="animate-fade-in-delayed"
-                />
-                <ProjectLink 
-                  href="https://www.youtube.com/@NosoyunRobotNo" 
-                  label="YouTube" 
-                  brand="youtube"
-                  delayClass="animate-fade-in-delayed"
-                />
-              </nav>
-
-              {/* Newsletter / Contact Section */}
-              <Newsletter delayClass="animate-fade-in-delayed" />
-
-              {/* Footer */}
-              <footer className={`mt-12 text-center transition-opacity duration-1000 delay-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
-                <p className="text-[10px] font-mono text-neutral-700 tracking-widest hover:text-neutral-500 transition-colors cursor-default">
-                  EST. 2025 — HUMANO VERIFICADO
-                </p>
-              </footer>
-
-            </main>
+            {/* Footer */}
+            <footer className="absolute bottom-6 text-neutral-600 text-xs font-mono z-10 opacity-60">
+              &copy; 2025 no soy un robot. Todos los derechos reservados.
+            </footer>
           </div>
         );
       };
@@ -418,3 +360,7 @@
     </script>
   </body>
 </html>
+    </script>
+  </body>
+</html>
+
