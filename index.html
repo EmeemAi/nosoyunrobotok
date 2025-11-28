@@ -163,26 +163,41 @@
         const [email, setEmail] = useState('');
         const [status, setStatus] = useState('idle'); // idle, submitting, success
 
-        // CONFIGURACIÓN DE GOOGLE SHEET (Opcional):
-        const GOOGLE_SCRIPT_URL = ""; 
+        // INSTRUCCIONES:
+        // 1. Crea una Google Sheet
+        // 2. Ve a Extensiones > Apps Script
+        // 3. Pega el código del servidor (doPost)
+        // 4. Implementar > Nueva implementación > Aplicación Web > Acceso: "Cualquier usuario"
+        // 5. Copia la URL que te dan y pégala abajo entre las comillas.
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyPgRtwSt4AYCDUXWrsY2qGRNpAa7N9YFpEldFHYuqJ5LQ1GrLsF1ZeD-UzmzQ8HA4/exec"; 
 
         const handleSubmit = async (e) => {
           e.preventDefault();
           setStatus('submitting');
           
-          if (GOOGLE_SCRIPT_URL) {
+          if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
             try {
+              // Usamos FormData para enviar los datos como si fuera un formulario HTML clásico
+              const formData = new FormData();
+              formData.append('email', email);
+
               await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
-                body: new FormData(e.target)
+                mode: 'no-cors', // Importante para Google Scripts
+                body: formData
               });
+              
+              // Con no-cors no podemos leer la respuesta, así que asumimos éxito si no hay error de red
               setStatus('success');
             } catch (error) {
+              console.error("Error enviando:", error);
+              // En caso de error de red, mostramos éxito simulado para no frustrar al usuario
+              // (o podrías mostrar un error si prefieres)
               setStatus('success');
             }
           } else {
-            // SIMULACIÓN
+            // SIMULACIÓN (Si no has puesto la URL todavía)
+            console.log("Simulando envío (Falta configurar GOOGLE_SCRIPT_URL)");
             setTimeout(() => {
               setStatus('success');
             }, 1000);
