@@ -158,108 +158,10 @@
         </svg>
       );
 
-      // --- Newsletter Component (Terminal Style) ---
-      const Newsletter = ({ delayClass }) => {
-        const [email, setEmail] = useState('');
-        const [status, setStatus] = useState('idle'); // idle, submitting, success
-
-        // INSTRUCCIONES:
-        // 1. Crea una Google Sheet
-        // 2. Ve a Extensiones > Apps Script
-        // 3. Pega el código del servidor (doPost)
-        // 4. Implementar > Nueva implementación > Aplicación Web > Acceso: "Cualquier usuario"
-        // 5. Copia la URL que te dan y pégala abajo entre las comillas.
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyPgRtwSt4AYCDUXWrsY2qGRNpAa7N9YFpEldFHYuqJ5LQ1GrLsF1ZeD-UzmzQ8HA4/exec"; 
-
-        const handleSubmit = async (e) => {
-          e.preventDefault();
-          setStatus('submitting');
-          
-          if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-            try {
-              // Usamos FormData para enviar los datos como si fuera un formulario HTML clásico
-              const formData = new FormData();
-              formData.append('email', email);
-
-              await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Importante para Google Scripts
-                body: formData
-              });
-              
-              // Con no-cors no podemos leer la respuesta, así que asumimos éxito si no hay error de red
-              setStatus('success');
-            } catch (error) {
-              console.error("Error enviando:", error);
-              // En caso de error de red, mostramos éxito simulado para no frustrar al usuario
-              // (o podrías mostrar un error si prefieres)
-              setStatus('success');
-            }
-          } else {
-            // SIMULACIÓN (Si no has puesto la URL todavía)
-            console.log("Simulando envío (Falta configurar GOOGLE_SCRIPT_URL)");
-            setTimeout(() => {
-              setStatus('success');
-            }, 1000);
-          }
-        };
-
-        if (status === 'success') {
-          return (
-             <div className={`w-full max-w-sm mt-8 ${delayClass} animate-fade-in`}>
-                <div className="flex flex-col items-center justify-center p-6 bg-green-900/10 border border-green-500/30 rounded text-center space-y-2 backdrop-blur-sm">
-                   <div className="flex items-center space-x-2 text-green-500 mb-1">
-                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                     <span className="font-mono text-xs uppercase tracking-widest">Estado: Verificado</span>
-                   </div>
-                   <p className="font-mono text-sm text-green-400">
-                     Gracias por suscribirte.
-                   </p>
-                   <p className="font-mono text-xs text-green-400/70">
-                     Estarás al tanto de las novedades humanas.
-                   </p>
-                </div>
-             </div>
-          );
-        }
-
-        return (
-          <div className={`w-full max-w-sm mt-8 ${delayClass} opacity-0 animate-fade-in`}>
-             <div className="flex items-center space-x-2 mb-2 px-1">
-               <div className={`w-2 h-2 rounded-full ${status === 'submitting' ? 'bg-yellow-500 animate-pulse' : 'bg-neutral-600'}`}></div>
-               <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">System_Log: Suscripción</span>
-             </div>
-             <form onSubmit={handleSubmit} className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-neutral-700 to-neutral-800 rounded opacity-50 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
-                <div className="relative flex items-center bg-black rounded border border-white/10 p-1">
-                  <span className="pl-3 pr-2 font-mono text-green-500 select-none">{'>'}</span>
-                  <input 
-                    name="email" 
-                    type="email" 
-                    placeholder={status === 'submitting' ? "conectando..." : "ingresa_tu_email..."}
-                    className="w-full bg-transparent border-none focus:ring-0 text-xs font-mono text-neutral-300 placeholder-neutral-600 h-10 disabled:opacity-50"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={status === 'submitting'}
-                    required
-                  />
-                  <button 
-                    type="submit" 
-                    disabled={status === 'submitting'}
-                    className="px-4 py-1.5 mr-1 bg-white/10 hover:bg-white/20 text-[10px] font-mono text-white rounded transition-colors uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {status === 'submitting' ? '...' : 'Enter'}
-                  </button>
-                </div>
-             </form>
-          </div>
-        );
-      };
-
       // --- Componente ProjectLink ---
       const ProjectLink = ({ href, label, brand, delayClass = '' }) => {
         
-        // Estilos base por marca (Colores siempre visibles)
+        // Estilos base por marca
         const brandStyles = brand === 'spotify' 
           ? 'border-spotify text-spotify shadow-[0_0_10px_rgba(29,185,84,0.1)]' 
           : 'border-youtube text-youtube shadow-[0_0_10px_rgba(255,0,0,0.1)]';
@@ -280,7 +182,7 @@
               ${delayClass} opacity-0 animate-fade-in
             `}
           >
-             {/* Efecto Sheen (Brillo que pasa) */}
+             {/* Efecto Sheen */}
             <div className="absolute top-0 left-0 w-1/2 h-full bg-white/10 skew-x-[-15deg] transform -translate-x-[150%] transition-transform duration-700 group-hover:animate-sheen pointer-events-none blur-sm"></div>
 
             <span className="text-lg font-medium tracking-wide z-10 flex items-center gap-3">
@@ -296,8 +198,13 @@
       const App = () => {
         const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+        useEffect(() => {
+          if (window.lucide) {
+            window.lucide.createIcons();
+          }
+        }, []);
+
         const handleMouseMove = (e) => {
-          // Normalizar posición del mouse (-1 a 1) para movimiento relativo
           const x = (e.clientX / window.innerWidth) * 2 - 1;
           const y = (e.clientY / window.innerHeight) * 2 - 1;
           setMousePos({ x, y });
@@ -348,18 +255,12 @@
                 brand="spotify"
                 delayClass="delay-[200ms]"
               />
-              
               <ProjectLink 
-                href="https://www.youtube.com/@NosoyunRobotNo"
+                href="https://www.youtube.com/@nosoyunrobotmusica"
                 label="Ver en YouTube"
                 brand="youtube"
                 delayClass="delay-[400ms]"
               />
-            </div>
-
-            {/* Newsletter Section */}
-            <div className="z-10 w-full flex justify-center">
-              <Newsletter delayClass="delay-[600ms]" />
             </div>
 
             {/* Footer */}
